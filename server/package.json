@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "@fastify/cors": "^9.0.1",
+    "dotenv": "^16.4.5",
+    "fastify": "^4.26.1",
+    "jsonwebtoken": "^9.0.2",
+    "ldap-authentication": "^3.0.3",
+    "ldapjs": "^3.0.7"
+  },
+  "scripts": {
+    "start": "node src/server.js"
+  }
+}
