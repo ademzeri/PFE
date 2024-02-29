@@ -1,0 +1,25 @@
+$soft-tertiary-color : #51A7B9;
+
+.bg-soft-tertiary-color{
+    background-color: rgba($color: $soft-tertiary-color, $alpha: .11);
+}
+
+$z-index-999 : 999;
+.z-index-999{
+    z-index: $z-index-999;
+}
+
+.border-none{
+    border:none;
+}
+
+$primary-color : #088FC4;
+
+.bg-primary-color{
+background-color:rgba($color: $primary-color, $alpha: .85);
+}
+
+$bold-primary-color:#6898C3;
+.text-bold-primary-color{
+color: $bold-primary-color;
+}
