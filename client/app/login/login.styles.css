@@ -1,5 +1,5 @@
-#background {
-    background-image: url('../../public/wave-background.svg');
+.login-section-background {
+    background-image: url('../../public/login-wave-background.svg');
     background-size: auto 100%;
     background-repeat: no-repeat;
     background-position:right;
