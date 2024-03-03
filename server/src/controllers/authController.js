@@ -1,30 +1,29 @@
-const authentificate = require("../services/authServices");
+const { userAuthenticate } = require("../services/authServices");
 
 const authController = {
   async login(request, reply) {
     try {
       const { email, password } = request.body;
       if (!email || !password) {
-        reply
+        return reply
           .status(400)
           .send({ ok: false, message: "Missing email or password" });
-        return;
       }
-      const response = await authentificate(email, password);
-      
-      if (!response.ok) {
-        reply.status(401).send({
-          ok: false,
-          message: response.message || "Authentication failed",
-        });
-      } else {
+
+      const response = await userAuthenticate(email, password);
+      if (response.ok) {
         reply.status(200).send({
           ok: true,
+          message: "User authenticated successfully",
           token: response.token,
+        });
+      } else {
+        reply.status(403).send({
+          ok: false,
+          message: "Invalid credentials",
         });
       }
     } catch (error) {
-      console.error("Error in the controller:", error);
       reply.status(500).send({ ok: false, message: "Internal server error" });
     }
   },

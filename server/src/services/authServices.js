@@ -1,66 +1,63 @@
 const ldap = require("ldapjs");
 const generateToken = require("../utils/jwt");
 const config = require("../../config");
-const { authenticate } = require("ldap-authentication");
+const userModel = require("../models/UserModel");
+async function userAuthenticate(email, password) {
+  const userDn = `mail=${email},${config.LDAP_BASE_DN}`;
 
-const client = ldap.createClient({
-  url: config.LDAP_URI,
-});
-
-async function authService(email, password) {
   try {
-    const userDn = `mail=${email},ou=team,dc=example,dc=com`;
+    const client = ldap.createClient({
+      url: config.LDAP_URI,
+    });
 
-    // Attempt LDAP authentication
-    let authenticated = false;
-    try {
-      authenticated = await authenticate({
-        ldapOpts: { url: config.LDAP_URI },
-        userDn: userDn,
-        userPassword: password,
+    // Bind to LDAP server
+    await new Promise((resolve, reject) => {
+      client.bind(userDn, password, (err) => {
+        if (err) {
+          client.unbind();
+          reject({ ok: false, message: "Invalid credentials", error: err });
+        } else {
+          resolve();
+        }
       });
-    } catch (error) {
-      // If the error is due to invalid credentials, return false
-      if (error && error.lde_message === "Invalid Credentials") {
+    });
+    // Generate JWT token upon successful authentication
+    const token = generateToken(email);
+    client.unbind();
+    return {
+      message: "Authentication successful",
+      ok: true,
+      token,
+    };
+    //Manipulate user in the database
+    /*     const userExists = await userModel.userExists(email);
+
+    if (userExists.ok) {
+      const createUser = await userModel.createUser({
+        email: email,
+        firstName: "adem",
+        lastName: "zerii",
+      });
+      if (createUser.ok) {
+        console.log("user created");
         return {
-          ok: false,
-          message: "Incorrect credentials",
-        };
-      } else if (error && error.code === "NO_SUCH_OBJECT") {
-        // If the error indicates the user does not exist, return a specific message
-        return {
-          ok: false,
-          message: "User does not exist",
-        };
-      } else {
-        // If it's another type of LDAP error, log it and continue
-        console.error("LDAP authentication failed:", error);
-        return {
-          ok: false,
-          message: "An error occurred during authentication",
+          message: "Authentication successful",
+          ok: true,
+          token,
+          newUser: true,
         };
       }
-    }
-
-    // If authentication succeeds, generate token and return success response
-    if (authenticated) {
-      const token = generateToken(password);
       return {
+        message: "Authentication successful",
         ok: true,
-        message: "User found",
-        token: token,
+        token,
+        newUser: false,
       };
-    } else {
-      // If authentication fails, return failure response
-      return {
-        ok: false,
-        message: "User not found or incorrect credentials",
-      };
-    }
-  } finally {
-    // Ensure the LDAP client is properly disconnected
-    client.unbind();
+    } */
+  } catch (error) {
+    console.error("LDAP authentication error:");
+    return { ok: false, message: "Server error" };
   }
 }
 
-module.exports = authService;
+module.exports = { userAuthenticate };
