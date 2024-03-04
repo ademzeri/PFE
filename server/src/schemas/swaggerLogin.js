@@ -21,6 +21,10 @@ const loginSchema = {
           ok: { type: "boolean", description: "Operation status" },
           message: { type: "string", description: "Operation message" },
           token: { type: "string", description: "Authentication token" },
+          newUser: {
+            type: "boolean",
+            description: "User is already registred in the database",
+          },
         },
       },
       400: {

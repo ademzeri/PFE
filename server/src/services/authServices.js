@@ -2,6 +2,7 @@ const ldap = require("ldapjs");
 const generateToken = require("../utils/jwt");
 const config = require("../../config");
 const userModel = require("../models/UserModel");
+
 async function userAuthenticate(email, password) {
   const userDn = `mail=${email},${config.LDAP_BASE_DN}`;
 
@@ -24,15 +25,16 @@ async function userAuthenticate(email, password) {
     // Generate JWT token upon successful authentication
     const token = generateToken(email);
     client.unbind();
-    return {
-      message: "Authentication successful",
-      ok: true,
-      token,
-    };
-    //Manipulate user in the database
-    /*     const userExists = await userModel.userExists(email);
-
+    const userExists = await userModel.userExists(email);
+    console.log("\n user exists : ", userExists);
     if (userExists.ok) {
+      return {
+        message: "Authentication successful",
+        ok: true,
+        token,
+        newUser: false,
+      };
+    } else {
       const createUser = await userModel.createUser({
         email: email,
         firstName: "adem",
@@ -47,13 +49,7 @@ async function userAuthenticate(email, password) {
           newUser: true,
         };
       }
-      return {
-        message: "Authentication successful",
-        ok: true,
-        token,
-        newUser: false,
-      };
-    } */
+    }
   } catch (error) {
     console.error("LDAP authentication error:");
     return { ok: false, message: "Server error" };
