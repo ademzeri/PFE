@@ -11,12 +11,9 @@ const authController = {
       }
 
       const response = await userAuthenticate(email, password);
+      console.log("\nresponse from controller : ", response, "\n");
       if (response.ok) {
-        reply.status(200).send({
-          ok: true,
-          message: "User authenticated successfully",
-          token: response.token,
-        });
+        reply.status(200).send(response);
       } else {
         reply.status(403).send({
           ok: false,
