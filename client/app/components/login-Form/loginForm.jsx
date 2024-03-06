@@ -6,9 +6,9 @@ import Link from "next/link";
 import EmailInput from "../Inputs/email/email-Input";
 import PasswordInput from "../Inputs/password/password-input";
 import Loginbutton from "../buttons/submit-button/login-button";
-import { signIn } from "next-auth/react";
-import {crypt} from "../../utils/hashPassword/hashPassword";
-
+import { IconInfoCircle } from '@tabler/icons-react';
+import {signIn} from "next-auth/react"; 
+import { useState } from 'react';
 
 const Schema = Yup.object().shape({
     email: Yup.string().email('Invalid email').required("Email is required"),
@@ -16,6 +16,7 @@ const Schema = Yup.object().shape({
 });
 
 const LoginForm = () => {
+    const [isValid, setIsValid] = useState(true);
     const {
         register,
         formState: {errors},
@@ -26,31 +27,32 @@ const LoginForm = () => {
         
     });
     
-    const onSubmit = async (data) =>{
-        const hashedPassword = await crypt(data.password);
-        
-         const response = await signIn('credentials',{
-            email:data.email,
-            password:hashedPassword,
-            redirect:false
-        });
-        if(response.ok){
-            console.log("logged in")
-        }else{
-            console.log("failed to login in")
+    const onSubmit = async (data) => {
+        try {
+            const response = await signIn('credentials', { redirect: false, ...data });
+            if (response.ok) {
+                console.log("user exist")
+                
+            } else {
+                setIsValid(isValid => !isValid);
+            }
+        } catch (error) {
+            console.error("Error during signIn:", error);
         }
     };
     
+    
     return ( 
-        <FormProvider handleSubmit={handleSubmit} register={register} errors={errors} >
+        <FormProvider  register={register} errors={errors} >
             <form className="login-form col-12 col-md-8 col-lg-10 col-xl-10 mx-auto " onSubmit={handleSubmit(onSubmit)}>
-                <EmailInput register={register('email')} errors={errors} />
-                <PasswordInput register={register('password')}  errors={errors} />
+                <EmailInput register={register('email')} errors={errors} isValid={isValid}  />
+                <PasswordInput register={register('password')}  errors={errors} isValid={isValid}  />
+                { !isValid && <div className='text-danger d-flex flex-row gap-2' >
+                    <i ><IconInfoCircle /></i>
+                    <p >Login failed. Please verify if your account exists in LDAP</p> 
+                </div> }
                 <Loginbutton type="submit" />
-                <div className="border w-50 m-auto my-3"></div>
-                <div className="w-100 text-center">
-                    <Link href="#" className="text-decoration-none text-bold-primary-color fw-semibold" id="forget-password">forget password ?</Link>
-                </div>
+                
             </form>
         </FormProvider>
     );
