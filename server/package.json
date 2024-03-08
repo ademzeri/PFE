@@ -10,7 +10,8 @@
     "ldap-authentication": "^3.0.3",
     "ldapjs": "^3.0.7",
     "ldapjs-client": "^0.1.2",
-    "mongodb": "6.3"
+    "mongodb": "6.3",
+    "node-fetch": "^3.3.2"
   },
   "scripts": {
     "start": "node src/server.js"
