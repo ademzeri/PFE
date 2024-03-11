@@ -29,20 +29,21 @@ const LoginForm = () => {
     
     const onSubmit = async (data) => {
         try {
-            const response = await signIn('credentials', { redirect: false, ...data });
-            if (response.ok) {
-                console.log("user exist")
-                
-            } else {
-                setIsValid(isValid => !isValid);
-            }
+          const response = await signIn('credentials', { redirect: false, ...data });
+          if (response.ok) {
+            console.log(response);
+            setIsValid(true);
+          } else {
+            setIsValid(isValid => !isValid);
+          }
         } catch (error) {
-            console.error("Error during signIn:", error);
+          console.error("Error during signIn:", error);
         }
-    };
-    
+      };
+      
     
     return ( 
+        
         <FormProvider  register={register} errors={errors} >
             <form className="login-form col-12 col-md-8 col-lg-10 col-xl-10 mx-auto " onSubmit={handleSubmit(onSubmit)}>
                 <EmailInput register={register('email')} errors={errors} isValid={isValid}  />
